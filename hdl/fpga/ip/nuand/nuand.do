@@ -17,8 +17,11 @@ proc compile_nuand { root } {
     vcom -work nuand -2008 [file join $root ./synthesis/tan_table.vhd]
     vcom -work nuand -2008 [file join $root ./synthesis/iq_correction.vhd]
 
+    vcom -work nuand -2008 [file join $root ./synthesis/signal_generator.vhd]
+
     vcom -work nuand -2008 [file join $root ./synthesis/synchronizer.vhd]
     vcom -work nuand -2008 [file join $root ./synthesis/handshake.vhd]
+    vcom -work nuand -2008 [file join $root ./synthesis/reset_synchronizer.vhd]
     vcom -work nuand -2008 [file join $root ./synthesis/tb/handshake_tb.vhd]
 
     vcom -work nuand -2008 [file join $root ./synthesis/signal_processing_p.vhd]
@@ -45,5 +48,7 @@ proc compile_nuand { root } {
     vcom -work nuand -2008 [file join $root ./synthesis/fifo_reader.vhd]
     vcom -work nuand -2008 [file join $root ./synthesis/fifo_writer.vhd]
     vcom -work nuand -2008 [file join $root ./simulation/sample_stream_tb.vhd]
+
+    vcom -work nuand -2008 [file join $root ./trigger/trigger.vhd]
 }
 
