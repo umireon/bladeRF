@@ -1,5 +1,6 @@
 library ieee ;
     use ieee.std_logic_1164.all ;
+    use ieee.numeric_std.all ;
 
 entity nios_system is
   port (
@@ -51,6 +52,8 @@ end entity ;
 
 architecture sim of nios_system is
 
+    signal tx_tamer_timestamp : unsigned(63 downto 0) ;
+
 begin
 
     command_serial_out <= '1' ;
@@ -77,7 +80,22 @@ begin
     spi_SS_n <= '1' ;
 
     tx_tamer_ts_sync_out <= '0' ;
-    tx_tamer_ts_time <= (others =>'0') ;
+    tx_tamer_ts_time <= std_logic_vector(tx_tamer_timestamp) ;
+    increment_time : process
+        variable tick : std_logic := '1' ;
+    begin
+        tick := '1' ;
+        tx_tamer_timestamp <= (others =>'0') ;
+        wait until not tx_tamer_ts_reset;
+        wait for 135 us;
+        while true loop
+            wait until rising_edge(tx_tamer_ts_clock);
+            if( tick = '0' ) then
+                tx_tamer_timestamp <= tx_tamer_timestamp + 1 ;
+            end if ;
+            tick := not tick ;
+        end loop ;
+    end process ;
 
     xb_gpio_out_port <= (others =>'0') ;
     xb_gpio_dir_export <= (others =>'0') ;
@@ -86,4 +104,3 @@ begin
     rx_trigger_ctl_out_port <= (others =>'0') ;
 
 end architecture ;
-
