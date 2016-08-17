@@ -135,6 +135,7 @@ begin
             wait until rising_edge( fx3_pclk ) and dma3_tx_ack = '1' ;
             wait until rising_edge( fx3_pclk ) ;
             wait until rising_edge( fx3_pclk ) ;
+            wait until rising_edge( fx3_pclk ) ;
             dma3_tx_reqx <= '1' ;
             if( fx3_tx_meta_en = '1') then
                 for i in 1 to 4 loop
