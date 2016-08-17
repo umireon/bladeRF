@@ -39,7 +39,13 @@ entity nios_system is
     tx_tamer_ts_time                : out std_logic_vector(63 downto 0);                    --                         .ts_time
     xb_gpio_in_port                 : in  std_logic_vector(31 downto 0) := (others => '0'); --                  xb_gpio.in_port
     xb_gpio_out_port                : out std_logic_vector(31 downto 0);                    --                         .out_port
-    xb_gpio_dir_export              : out std_logic_vector(31 downto 0)                     --              xb_gpio_dir.export
+    xb_gpio_dir_export              : out std_logic_vector(31 downto 0);                    --              xb_gpio_dir.export
+    vctcxo_tamer_tune_ref           : in  std_logic;                                        --             vctcxo_tamer.tune_ref
+    vctcxo_tamer_vctcxo_clock       : in  std_logic;                                        --                         .vctcxo_clock
+    tx_trigger_ctl_in_port          : in  std_logic_vector(7 downto 0);                     --           tx_trigger_ctl.in_port
+    tx_trigger_ctl_out_port         : out std_logic_vector(7 downto 0);                     --                         .out_port
+    rx_trigger_ctl_in_port          : in  std_logic_vector(7 downto 0);                     --           rx_trigger_ctl.in_port
+    rx_trigger_ctl_out_port         : out std_logic_vector(7 downto 0)                      --                         .out_port
   );
 end entity ;
 
@@ -75,6 +81,9 @@ begin
 
     xb_gpio_out_port <= (others =>'0') ;
     xb_gpio_dir_export <= (others =>'0') ;
+
+    tx_trigger_ctl_out_port <= (others =>'0') ;
+    rx_trigger_ctl_out_port <= (others =>'0') ;
 
 end architecture ;
 
