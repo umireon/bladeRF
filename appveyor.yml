@@ -1,0 +1,29 @@
+version: 1.0.{build}
+image: Visual Studio 2013
+configuration: Release
+platform:
+  - x64
+  - Win32
+init:
+  - curl --retry 5 -fssL http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/libusb-1.0.20.7z/download -o %TMP%\libusb-1.0.20.7z
+  - 7z x -y -o"C:\Program Files (x86)\libusb-1.0.20" %TMP%\libusb-1.0.20.7z
+  - curl --retry 5 -fssL ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip -o %TMP%\pthreads-w32-2-9-1-release.zip
+  - 7z x -y -o%TMP%\pthreads-win32 %TMP%\pthreads-w32-2-9-1-release.zip Pre-built.2
+  - xcopy %TMP%\pthreads-win32\Pre-built.2 "C:\Program Files (x86)\pthreads-win32" /I /S
+before_build:
+  - mkdir host\build
+  - cd host\build
+  - ps: >-
+      if ($Env:Platform -eq "Win32") {
+        $Env:P = "Visual Studio 12 2013"
+      } else {
+        $Env:P = "Visual Studio 12 2013 Win64"
+      }
+  - cmake -G "%P%" ..
+  - cd "%APPVEYOR_BUILD_FOLDER%"
+build:
+  project: host\build\bladeRF.sln
+  verbosity: minimal
+artifacts:
+  - path: host/build/output/Release
+    name: bladeRF-host
