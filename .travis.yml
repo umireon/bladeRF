@@ -1,16 +1,35 @@
-language: cpp
+cache:
+  directories:
+    - $HOME/dl
 matrix:
   include:
     - os: linux
+      language: cpp
       dist: trusty
       sudo: required
+      env: ENABLE_HOST_BUILD=ON ENABLE_FX3_BUILD=OFF
     - os: osx
+      language: cpp
+      env: ENABLE_HOST_BUILD=ON ENABLE_FX3_BUILD=OFF
+    - os: linux
+      language: bash
+      env: ENABLE_HOST_BUILD=OFF ENABLE_FX3_BUILD=ON FX3_INSTALL_PATH=$HOME/fx3_sdk
+      addons:
+        apt:
+          packages:
+            - libc6:i386
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libusb-1.0-0 libusb-1.0-0-dev libtecla1 libtecla1-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install libusb libtecla; fi
+  - mkdir -p $HOME/dl
+  - if [[ "$ENABLE_FX3_BUILD" == "ON" ]]; then if [[ ! -e $HOME/dl/ARM_GCC.tar.gz ]]; then curl -fssL -o $HOME/dl/ARM_GCC.tar.gz "${FX3_ARMGCC_URL}"; fi; fi
+  - if [[ "$ENABLE_FX3_BUILD" == "ON" ]]; then if [[ ! -e $HOME/dl/fx3_firmware_linux.tar.gz ]]; then curl -fssL -o $HOME/dl/fx3_firmware_linux.tar.gz "${FX3_FIRMWARE_URL}"; fi; fi
+  - if [[ "$ENABLE_FX3_BUILD" == "ON" ]]; then mkdir -p $HOME/fx3_sdk; fi
+  - if [[ "$ENABLE_FX3_BUILD" == "ON" ]]; then tar xzf $HOME/dl/ARM_GCC.tar.gz -C $HOME/fx3_sdk; fi
+  - if [[ "$ENABLE_FX3_BUILD" == "ON" ]]; then tar xzf $HOME/dl/fx3_firmware_linux.tar.gz -C $HOME/fx3_sdk; fi
+  - if [[ "$ENABLE_HOST_BUILD" == "ON" ]]; then if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq; fi; fi
+  - if [[ "$ENABLE_HOST_BUILD" == "ON" ]]; then if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libusb-1.0-0 libusb-1.0-0-dev libtecla1 libtecla1-dev; fi; fi
+  - if [[ "$ENABLE_HOST_BUILD" == "ON" ]]; then if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi; fi
+  - if [[ "$ENABLE_HOST_BUILD" == "ON" ]]; then if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install libusb libtecla; fi; fi
 script:
-  - mkdir host/build
-  - cd host/build
-  - cmake .. && make
+  - mkdir build
+  - cd build
+  - cmake -DENABLE_HOST_BUILD=$ENABLE_HOST_BUILD -DENABLE_FX3_BUILD=$ENABLE_FX3_BUILD .. && make
